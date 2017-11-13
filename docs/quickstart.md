@@ -1,18 +1,36 @@
-# Quickstart
+# Overview
 
 ## Panel
 
-![Panel Overlay](img/panel-overlay.png)
+![Panel Overlay](img/panel-overlay2.png)
 
-The keyboard is attached to the front panel, for typing commands. The commands can be executed immediately in *LIVE mode* or assigned to one of the eight trigger inputs in *EDIT mode*. The knob and in jack can be used to set and replace values.
+A. Trigger inputs 1-8 - Sending a pulse or rising edge of a gate to these inputs causes their respective scripts to execute. The detection threshold is 0.?V. Both audio rate and control signals are accepted.
+
+B. In & Param - Values of the CV input (0-10V range) and param knob can be read into teletype. The knob and in jack can be used to set and replace values within the teletype environment. The param knob can also be used to scroll presets once you have pressed scene recall or directly adjust values in the pattern mode while holding the appropriate modifier keys on the keyboard.
+
+C. TR outputs 1-4 - Outputs gate or trigger signals (0-5V). Labelled A-D on earlier units.
+
+D. CV outputs 1-4 -- Outputs CV values (0-10V).
+
+E. USB port - The USB port has several purposes. It is used to connect the included keyboard for typing commands and interacting w/ teletype. With a jump drive attached to the USB you can save scripts or upload saved scripts to the unit. Teletype additionally uses this port to receive firmware updates by connecting to a computer using a USB A-A cable. Current community development is underway in adding grid based interaction via USB.
+
+F. Scene Recall - allows you to select scenes without a keyboard attached to teletype.
+
+## Interface Navigation
+
+![Navigation](img/navigation.png)
 
 ## LIVE mode
 
-Teletype starts up in LIVE mode. You'll see a friendly **>** prompt, where commands are entered. The command:
+Teletype starts up in LIVE mode, you’ll see a friendly **>** prompt in the lower left corner of the screen. If for some reason this is not the case hit the `TAB` key until you see the **>** prompt (`TAB` cycles through LIVE, EDIT, and PATTERN mode. We’ll be working with all these shortly).
 
-    TR.TOG A
+LIVE mode allows the user to interact directly with teletype by entering commands on the keyboard. Commands are limited to 30 characters, and each command is executed immediately upon hitting enter.
 
-will toggle trigger A after pressing enter. Consider:
+Let’s try some basic commands:
+
+    TR.TOG 1
+
+will toggle trigger 1 after pressing enter. Next, consider:
 
     CV 1 V 5
     CV 2 N 7
@@ -28,18 +46,23 @@ Here a random note between 0 and 12 is set to CV 1.
 
 We can change the behavior of a command with a *PRE* such as `DEL`:
 
-    DEL 500 : TR.TOG A
+    DEL 500 : TR.TOG 1
 
-`TR.TOG A` will be delayed by 500ms upon execution.
+`TR.TOG 1` will be delayed by 500ms upon execution.
 
-A helpful display line appears above the command line in dim font. Here any entered commands will return their numerical value if they have one.
+### Some helpful bits:
 
-*SCRIPTS*, or several lines of commands, can be assigned to trigger inputs. This is when things get musically interesting. To edit each script, we shift into EDIT mode.
+* A display line appears above the command line in dim font. Here any entered commands will return their numerical value if they have one.
+
+* You can scroll through your history of commands using the up and down arrows.
+
+* You can copy and paste the currently selected command for use in a script using `ALT+C` & `ALT+V`.
+
+* Navigate directly to live mode with `F12`.
 
 ### LIVE mode icons
-
-Four small icons are displayed in LIVE mode to give some important feedback about the state of Teletype. These icons will be brightly lit when the above is true, else will remain dim. They are, from left to right:
-
+Five small icons are displayed in LIVE mode to give some important feedback about the state of Teletype. These icons will be brightly lit when the above is true, else will remain dim. They are, from left to right:
+* Trigger Mutes: 8 dots indicate the 8 trigger inputs. Bright dots indicate muted triggers
 * Slew: CV outputs are currently slewing to a new destination.
 * Delay: Commands are in the delay queue to be executed in the future.
 * Stack: Commands are presently on the stack waiting for execution.
@@ -47,30 +70,32 @@ Four small icons are displayed in LIVE mode to give some important feedback abou
 
 ## EDIT mode
 
-Toggle between EDIT and LIVE modes by pushing **TAB**.
+*SCRIPTS*, a group of up to 6 commands, can be assigned to each of the 8 trigger inputs. This is when things get musically interesting. To edit a script, we shift into EDIT mode. To enter EDIT mode from LIVE mode hit `TAB` (recall: `TAB` rotates through modes in the following order: EDIT, LIVE, PATTERN)
 
-The prompt now indicates the script you're currently editing:
+Where in edit mode a **>** prompt was in the bottom left corner of the screen, in EDIT mode you will see a character indicating which script you are editing:
 
 * `1`-`8` indicates the script associated with corresponding trigger
 * `M` is for the internal metronome
 * `I` is the init script, which is executed upon scene recall
 
+You can rotate through these 10 scripts using the bracket keys `[`and`]`.After typing a command into EDIT mode you must press `Return`in order to store it into the highlighted line in your Script. The up/down arrows allow you to select different lines to edit.
+
 Script 1 will be executed when trigger input 1 (top left jack on the panel) receives a low-to-high voltage transition (trigger, or front edge of a gate). Consider the following as script 1:
 
 1:
 
-    TR.TOG A
+    TR.TOG 1
 
-Now when input 1 receives a trigger, `TR.TOG A` is executed, which toggles the state of output trigger A.
+Now when input 1 receives a trigger, `TR.TOG 1` is executed, which toggles the state of Trigger 1.
 
 Scripts can have multiple lines:
 
 1:
 
-    TR.TOG A
+    TR.TOG 1
     CV 1 V RAND 4
 
-Now each time input 1 receives a trigger, CV 1 is set to a random volt between 0 and 4, in addition to output trigger A being toggled.
+Now each time input 1 receives a trigger, CV 1 is set to a random volt between 0 and 4, in addition to output trigger 1 being toggled.
 
 ### Metronome
 
@@ -84,9 +109,13 @@ The metronome interval is now 500ms. You can disable/enable the metronome entire
 
 Now the metronome is off, and the `M` script will not be executed. Set `M.ACT` to 1 to re-enable.
 
+### Init Script
+
+The *INIT* script (represented as `I`) is executed when a preset is recalled. This is a good place to set initial values of variables if needed, like metro time `M` or time enable `TIME.ACT` for example.
+
 ## Patterns
 
-Patterns facilitate musical data manipulation-- lists of numbers that can be used as sequences, chord sets, rhythms, or whatever you choose. Pattern memory consists four banks of 64 steps. Functions are provided for a variety of pattern creation, transformation, and playback. The most basic method of creating a pattern is by directly adding numbers to the sequence:
+Patterns facilitate musical data manipulation-- lists of numbers that can be used as sequences, chord sets, rhythms, or whatever you choose. Pattern memory consists of four banks of 64 steps. Functions are provided for a variety of pattern creation, transformation, and playback. The most basic method of creating a pattern is by directly adding numbers to the sequence. In LIVE mode try:
 
     P.PUSH 5
     P.PUSH 11
@@ -129,24 +158,21 @@ We can directly access and change *any* pattern value with the command `PN`:
 
     PN 3 0 22
 
-Here the first argument (3) is the *bank*, second (0) is the *index*, and last is the new value (22). You could do this by doing `P.N 3` then `P 0 22` but there are cases where a direct read/write is needed in your patch.
-
-Check the *Command Set* section below for more pattern commands.
+Here the first argument (3) is the *bank*, second (0) is the *index*, and last is the new value (22). You could do this by doing `P.N 3` then `P 0 22` but there are cases where a direct read/write is needed in your patch. In Teletype v2.0 all `P` operators have equivalent `PN` operators which allow quick access to any of the 4 patterns and saves script length.
 
 Patterns are stored in flash with each scene!
 
-### TRACKER mode
+### PATTERN mode
 
-Editing patterns with scripts or from the command line isn't always ergonomic. When you'd like to visually edit patterns, TRACKER mode is the way.
+Editing patterns with scripts or from the command line isn't always ergonomic. When you'd like to visually edit patterns, PATTERN mode is the way.
 
-The `TAB` key cycles between LIVE, EDIT and TRACKER mode.  You can also get directly to TRACKER mode by pressing the `NUM LOCK` key.  TRACKER mode is the one with 4 columns of numbers on the Teletype screen.
+`TAB` through the modes to get to PATTERN mode. It's after EDIT mode, and displays the current pattern memory in a 4 column matrix of values. You can also get directly to PATTERN mode by pressing the `NUM LOCK` key.
 
-The current pattern memory is displayed in these columns. Use the arrow keys to navigate. Holding ALT will jump by pages.
+Use the arrow keys to navigate. Holding `ALT` will jump by pages.
 
 The edit position is indicated by the brightest number. Very dim numbers indicate they are outside the pattern length.
 
-Use the square bracket keys `[` and `]` to decrease/increase the values. Backspace sets the value to 0. Entering numbers will overwrite a new value. You can cut/copy/paste with ALT-X-C-V.
-
+Use the square bracket keys `[` and `]` to decrease/increase the values. Backspace sets the value to 0. Entering numbers will overwrite a new value. You can cut/copy/paste with `ALT-X-C-V`.
 
 ## Scenes
 
@@ -164,27 +190,19 @@ To facilitate performance without the need for the keyboard, scenes can be recal
 * Use the `PARAM` knob to highlight your desired preset.
 * Hold the `SCENE RECALL` button for 1 second to load the selected scene.
 
-### Init Script
-
-The *INIT* script (represented as `I`) is executed when a preset is recalled. This is a good place to set initial values of variables if needed, like metro time `M` or time enable `TIME.ACT` for example.
-
-## Commands
-
-### Nomenclature
+## Teletype Syntax
 
 * SCRIPT -- multiple *commands*
 * COMMAND -- a series (one line) of *words*
 * WORD -- a text string separated by a space: *value*, *operator*, *variable*, *mod*
 * VALUE -- a number
 * OPERATOR -- a function, may need value(s) as argument(s), may return value
-* VARIABLE -- named memory storage
-* MOD -- condition/rule that applies to rest of the *command*, e.g.: del, prob, if, s
+* VARIABLE -- named memory storage ie X, Y, or Z
+* MOD/PRE? -- condition/rule that applies to rest of the *command*, ie DEL, PROB, IF
 
-### Syntax
+Teletype uses [prefix notation](https://en.wikipedia.org/wiki/Polish_notation). Evaluation happens from right to left. The left value gets assignment (*set*).
 
-Teletype uses prefix notation. Evaluation happens from right to left.
-
-The left value gets assignment (*set*). Here, temp variable `X` is assigned zero:
+Here, temp variable `X` is assigned zero:
 
     X 0
 
